@@ -1,5 +1,6 @@
 package org.example.movie.api.client;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,8 +11,6 @@ import ru.dpd.edu.model.MovieRequest;
 
 import java.time.LocalDate;
 import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateMovieTest {
     private MovieApiClient movieApiClient;
@@ -31,25 +30,32 @@ public class CreateMovieTest {
                 Set.of(Genre.THRILLER)
         );
 
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
         Movie createdMovie = movieApiClient.createMovie(request);
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertAll(
-                () -> assertNotNull(createdMovie),
-                () -> assertEquals(4L, createdMovie.id()),
-                () -> assertEquals(request.title(), createdMovie.title()),
-                () -> assertEquals(request.durationInMinutes(), createdMovie.durationInMinutes()),
-                () -> assertEquals(request.genres(), createdMovie.genres()),
-                () -> assertEquals(request.releaseDate(), createdMovie.releaseDate()),
-                () -> assertNotNull(createdMovie.createdAt()),
-                () -> assertNotNull(createdMovie.updatedAt()));
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(createdMovie),
+                () -> Assertions.assertEquals(4L, createdMovie.id()),
+                () -> Assertions.assertEquals(request.title(), createdMovie.title()),
+                () -> Assertions.assertEquals(request.durationInMinutes(), createdMovie.durationInMinutes()),
+                () -> Assertions.assertEquals(request.genres(), createdMovie.genres()),
+                () -> Assertions.assertEquals(request.releaseDate(), createdMovie.releaseDate()),
+                () -> Assertions.assertNotNull(createdMovie.createdAt()),
+                () -> Assertions.assertNotNull(createdMovie.updatedAt()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage + 1));
     }
 
     @Test
     @DisplayName("Проверка ошибки при создании фильма с пустыми полями")
     public void createMovieWithNullRequest() {
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(null));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(null));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Заполните данные фильма", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Заполните данные фильма", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 
     @Test
@@ -62,9 +68,13 @@ public class CreateMovieTest {
                 Set.of(Genre.THRILLER)
         );
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Заполните заголовок фильма", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Заполните заголовок фильма", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 
     @Test
@@ -77,9 +87,13 @@ public class CreateMovieTest {
                 Set.of(Genre.THRILLER)
         );
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Заголовок фильма пуст", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Заголовок фильма пуст", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 
     @Test
@@ -92,9 +106,13 @@ public class CreateMovieTest {
                 Set.of(Genre.THRILLER)
         );
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Заполните продолжительность фильма", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Заполните продолжительность фильма", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 
     @Test
@@ -107,9 +125,13 @@ public class CreateMovieTest {
                 null
         );
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Заполните жанры фильма", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Заполните жанры фильма", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 
     @Test
@@ -122,9 +144,13 @@ public class CreateMovieTest {
                 Set.of()
         );
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Список жанров фильма пуст", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Список жанров фильма пуст", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 
     @Test
@@ -137,9 +163,13 @@ public class CreateMovieTest {
                 Set.of(Genre.THRILLER)
         );
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Заполните дату релиза фильма", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Заполните дату релиза фильма", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 
     @Test
@@ -152,8 +182,12 @@ public class CreateMovieTest {
                 Set.of(Genre.THRILLER)
         );
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> movieApiClient.createMovie(request));
+        int resultMovieStorage = movieApiClient.getAllFilms().size();
 
-        assertEquals("Дата релиза не может быть больше текущей", exception.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("Дата релиза не может быть больше текущей", exception.getMessage()),
+                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
     }
 }
