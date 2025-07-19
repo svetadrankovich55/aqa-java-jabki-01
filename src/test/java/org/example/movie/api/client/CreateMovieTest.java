@@ -22,7 +22,7 @@ public class CreateMovieTest {
 
     @Test
     @DisplayName("Успешное создание фильма")
-    public void createMovieValidRequestReturnsCreatedMovie() {
+    public void createMovieWithValidRequest() {
         MovieRequest request = new MovieRequest(
                 "Inception",
                 148L,
@@ -30,7 +30,7 @@ public class CreateMovieTest {
                 Set.of(Genre.THRILLER)
         );
 
-        int sizeMovieStorage = movieApiClient.getAllFilms().size();
+        int initialSize = movieApiClient.getAllFilms().size();
         Movie createdMovie = movieApiClient.createMovie(request);
         int resultMovieStorage = movieApiClient.getAllFilms().size();
 
@@ -43,7 +43,7 @@ public class CreateMovieTest {
                 () -> Assertions.assertEquals(request.releaseDate(), createdMovie.releaseDate()),
                 () -> Assertions.assertNotNull(createdMovie.createdAt()),
                 () -> Assertions.assertNotNull(createdMovie.updatedAt()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage + 1));
+                () -> Assertions.assertEquals(initialSize + 1,resultMovieStorage ));
     }
 
     @Test
@@ -55,7 +55,7 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Заполните данные фильма", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () -> Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 
     @Test
@@ -74,7 +74,7 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Заполните заголовок фильма", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () -> Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Заголовок фильма пуст", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () -> Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Заполните продолжительность фильма", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () -> Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Заполните жанры фильма", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () -> Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Список жанров фильма пуст", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () -> Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 
     @Test
@@ -169,7 +169,7 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Заполните дату релиза фильма", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () -> Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 
     @Test
@@ -188,6 +188,6 @@ public class CreateMovieTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals("Дата релиза не может быть больше текущей", exception.getMessage()),
-                () -> Assertions.assertEquals(resultMovieStorage, sizeMovieStorage));
+                () ->Assertions.assertEquals(sizeMovieStorage, resultMovieStorage));
     }
 }
