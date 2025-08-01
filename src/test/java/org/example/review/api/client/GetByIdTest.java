@@ -6,8 +6,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.dpd.edu.MovieApiClient;
 import ru.dpd.edu.ReviewApiClient;
+import ru.dpd.edu.model.Movie;
 import ru.dpd.edu.model.Review;
 import ru.dpd.edu.model.ReviewRequest;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class GetByIdTest {
@@ -36,15 +41,25 @@ public class GetByIdTest {
     @Test
     @DisplayName("Проверка получения отзыва после создания")
     public void getByFilmIdMultipleReviews() {
-        ReviewRequest request = ReviewRequest.builder().filmId(2L).text("Новый отзыв").like(false).reviewerName("Новый автор").build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest request = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("Новый отзыв")
+                .like(false)
+                .reviewerName("Новый автор")
+                .build();
         Review createdReview = reviewApiClient.createReview(request);
         Long newId = createdReview.id();
 
-        Review resultReview = reviewApiClient.getById(2L);
+        Review resultReview = reviewApiClient.getById(newId);
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(newId, resultReview.id()),
-                () -> Assertions.assertEquals(2L, resultReview.filmId()),
+                () -> Assertions.assertEquals(movieId, resultReview.filmId()),
                 () -> Assertions.assertEquals("Новый отзыв", resultReview.text()),
                 () -> Assertions.assertEquals("Новый автор", resultReview.reviewerName()),
                 () -> Assertions.assertFalse(resultReview.like()),

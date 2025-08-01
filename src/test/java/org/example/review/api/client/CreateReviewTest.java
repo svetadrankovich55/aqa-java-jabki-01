@@ -6,9 +6,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.dpd.edu.MovieApiClient;
 import ru.dpd.edu.ReviewApiClient;
+import ru.dpd.edu.model.Movie;
 import ru.dpd.edu.model.Review;
 import ru.dpd.edu.model.ReviewRequest;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 
@@ -25,23 +29,33 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Успешное создание отзыва")
     public void createReviewWithValidRequest() {
-        ReviewRequest validRequest = ReviewRequest.builder().filmId(1L).text("Шедевр").like(true).reviewerName("Критик").build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
+
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest validRequest = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("Шедевр")
+                .like(true)
+                .reviewerName("Критик")
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         Review createdReview = reviewApiClient.createReview(validRequest);
-        Set<Review> reviewsForFilm1L = reviewApiClient.getByFilmId(1L);
+        Set<Review> reviewsForFilm1L = reviewApiClient.getByFilmId(movieId);
         int resultReviewStorage = reviewApiClient.getAll().size();
 
         Assertions.assertAll(
                 () -> Assertions.assertNotNull(createdReview),
-                () -> Assertions.assertEquals(2L, createdReview.id()),
                 () -> Assertions.assertEquals(validRequest.filmId(), createdReview.filmId()),
                 () -> Assertions.assertEquals(validRequest.text(), createdReview.text()),
                 () -> Assertions.assertEquals(validRequest.like(), createdReview.like()),
                 () -> Assertions.assertEquals(validRequest.reviewerName(), createdReview.reviewerName()),
                 () -> Assertions.assertNotNull(createdReview.createdAt()),
                 () -> Assertions.assertTrue(reviewApiClient.getAll().contains(createdReview)),
-                () -> Assertions.assertTrue(reviewsForFilm1L.stream().allMatch(review -> review.filmId() == 1L)),
+                () -> Assertions.assertTrue(reviewsForFilm1L.stream().allMatch(review -> review.filmId().equals(movieId))),
                 () -> Assertions.assertEquals(initialSize + 1, resultReviewStorage));
     }
 
@@ -60,7 +74,12 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Проверка ошибки при создании отзыва с Null ID фильма")
     public void createReviewWithNullFilmId() {
-        ReviewRequest request = ReviewRequest.builder().filmId(null).text("типа шедевр,епта!").like(false).reviewerName("Диванный Критик").build();
+        ReviewRequest request = ReviewRequest.builder()
+                .filmId(null)
+                .text("типа шедевр,епта!")
+                .like(false)
+                .reviewerName("Диванный Критик")
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.createReview(request));
@@ -74,7 +93,18 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Проверка ошибки при создании отзыва с Null текстом")
     public void createReviewWithNullText() {
-        ReviewRequest request = ReviewRequest.builder().filmId(1L).text(null).like(true).reviewerName("Диванный Критик").build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
+
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest request = ReviewRequest.builder()
+                .filmId(movieId)
+                .text(null)
+                .like(true)
+                .reviewerName("Диванный Критик")
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.createReview(request));
@@ -88,7 +118,18 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Проверка ошибки при создании отзыва с пустым текстом")
     public void createReviewWithBlankText() {
-        ReviewRequest request = ReviewRequest.builder().filmId(1L).text("  ").like(true).reviewerName("Диванный Критик").build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
+
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest request = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("  ")
+                .like(true)
+                .reviewerName("Диванный Критик")
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.createReview(request));
@@ -102,7 +143,18 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Проверка ошибки при создании отзыва с Null like")
     public void createReviewWithNullLike() {
-        ReviewRequest request = ReviewRequest.builder().filmId(1L).text("типа шедевр,епта!").like(null).reviewerName("Диванный Критик").build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
+
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest request = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("типа шедевр,епта!")
+                .like(null)
+                .reviewerName("Диванный Критик")
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.createReview(request));
@@ -116,7 +168,18 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Проверка ошибки при создании отзыва с Null like")
     public void createReviewWithNullReviewerName() {
-        ReviewRequest request = ReviewRequest.builder().filmId(1L).text("типа шедевр,епта!").like(false).reviewerName(null).build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
+
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest request = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("типа шедевр,епта!")
+                .like(false)
+                .reviewerName(null)
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.createReview(request));
@@ -130,7 +193,18 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Проверка ошибки при создании отзыва с Null like")
     public void createReviewWithBlankReviewerName() {
-        ReviewRequest request = ReviewRequest.builder().filmId(1L).text("типа шедевр,епта!").like(false).reviewerName("    ").build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
+
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest request = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("типа шедевр,епта!")
+                .like(false)
+                .reviewerName("    ")
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.createReview(request));
@@ -144,9 +218,25 @@ public class CreateReviewTest {
     @Test
     @DisplayName("Проверка создания нескольких отзывов для одного фильма")
     public void createMultipleReviewWithValidRequest() {
-        ReviewRequest request1 = ReviewRequest.builder().filmId(1L).text("Первый отзыв").like(true).reviewerName("Первый автор").build();
+        List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
+        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Collections.shuffle(movies);
 
-        ReviewRequest request2 = ReviewRequest.builder().filmId(1L).text("Второй отзыв").like(false).reviewerName("Второй автор").build();
+        Long movieId = movies.getFirst().id();
+
+        ReviewRequest request1 = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("Первый отзыв")
+                .like(true)
+                .reviewerName("Первый автор")
+                .build();
+
+        ReviewRequest request2 = ReviewRequest.builder()
+                .filmId(movieId)
+                .text("Второй отзыв")
+                .like(false)
+                .reviewerName("Второй автор")
+                .build();
 
         int initialSize = reviewApiClient.getAll().size();
         Review review1 = reviewApiClient.createReview(request1);
@@ -154,8 +244,7 @@ public class CreateReviewTest {
         int resultReviewStorage = reviewApiClient.getAll().size();
 
         Assertions.assertAll(
-                () -> Assertions.assertEquals(2L, review1.id()),
-                () -> Assertions.assertEquals(3L, review2.id()),
+                () -> Assertions.assertNotEquals(review1.id(), review2.id(), "ID отзывов должны быть уникальны"),
                 () -> Assertions.assertTrue(reviewApiClient.getAll().contains(review1)),
                 () -> Assertions.assertTrue(reviewApiClient.getAll().contains(review2)),
                 () -> Assertions.assertEquals(initialSize + 2, resultReviewStorage));

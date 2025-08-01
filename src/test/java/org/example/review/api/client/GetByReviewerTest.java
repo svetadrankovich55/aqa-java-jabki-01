@@ -6,9 +6,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.dpd.edu.MovieApiClient;
 import ru.dpd.edu.ReviewApiClient;
+import ru.dpd.edu.model.Genre;
+import ru.dpd.edu.model.Movie;
+import ru.dpd.edu.model.MovieRequest;
 import ru.dpd.edu.model.Review;
 import ru.dpd.edu.model.ReviewRequest;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 public class GetByReviewerTest {
@@ -38,27 +42,78 @@ public class GetByReviewerTest {
     @Test
     @DisplayName("Проверка получения отзыва после создания")
     public void getByReviewerMultipleReview() {
-        ReviewRequest request = ReviewRequest.builder().filmId(2L).text("Новый отзыв").like(false).reviewerName("Арсений Евсеевич").build();
-        ReviewRequest request1 = ReviewRequest.builder().filmId(2L).text("Первый отзыв").like(true).reviewerName("Арсений Евсеевич").build();
-        ReviewRequest request2 = ReviewRequest.builder().filmId(1L).text("Второй отзыв").like(false).reviewerName("Арсений Евсеевич").build();
-        ReviewRequest request3 = ReviewRequest.builder().filmId(3L).text("Третий отзыв").like(false).reviewerName("Арсений Евсеевич").build();
+        MovieRequest movierequest1 = new MovieRequest(
+                "Inception",
+                148L,
+                LocalDate.of(2010, 7, 16),
+                Set.of(Genre.THRILLER)
+        );
+        Movie testMovie1 = movieApiClient.createMovie(movierequest1);
+        Long testMovie1Id = testMovie1.id();
+
+        MovieRequest movierequest2 = new MovieRequest(
+                "Inception 2.0",
+                148L,
+                LocalDate.of(2010, 7, 16),
+                Set.of(Genre.THRILLER)
+        );
+        Movie testMovie2= movieApiClient.createMovie(movierequest2);
+        Long testMovie2Id = testMovie2.id();
+
+        MovieRequest movierequest3 = new MovieRequest(
+                "Inception 3.0",
+                148L,
+                LocalDate.of(2010, 7, 16),
+                Set.of(Genre.THRILLER)
+        );
+        Movie testMovie3= movieApiClient.createMovie(movierequest3);
+        Long testMovie3Id = testMovie3.id();
+
+        ReviewRequest reviewRequest1 = ReviewRequest.builder()
+                .filmId(testMovie1Id)
+                .text("Новый отзыв")
+                .like(false)
+                .reviewerName("Арсений Евсеевич")
+                .build();
+        ReviewRequest reviewRequest2 = ReviewRequest.builder()
+                .filmId(testMovie2Id)
+                .text("Первый отзыв")
+                .like(true)
+                .reviewerName("Арсений Евсеевич")
+                .build();
+        ReviewRequest reviewRequest3 = ReviewRequest.builder()
+                .filmId(testMovie2Id)
+                .text("Второй отзыв")
+                .like(false)
+                .reviewerName("Арсений Евсеевич").build();
+        ReviewRequest reviewRequest4 = ReviewRequest.builder()
+                .filmId(testMovie3Id)
+                .text("Третий отзыв")
+                .like(false)
+                .reviewerName("Арсений Евсеевич")
+                .build();
 
         int initialSize = reviewApiClient.getByReviewer("Арсений Евсеевич").size();
-        Review createdReview = reviewApiClient.createReview(request);
-        Review createdReview1 = reviewApiClient.createReview(request1);
-        Review createdReview2 = reviewApiClient.createReview(request2);
-        Review createdReview3 = reviewApiClient.createReview(request3);
+        Review createdReview1 = reviewApiClient.createReview(reviewRequest1);
+        Review createdReview2 = reviewApiClient.createReview(reviewRequest2);
+        Review createdReview3 = reviewApiClient.createReview(reviewRequest3);
+        Review createdReview4 = reviewApiClient.createReview(reviewRequest4);
         int resultSize = reviewApiClient.getByReviewer("Арсений Евсеевич").size();
 
+        Set<Review> reviewerReviews = reviewApiClient.getByReviewer("Арсений Евсеевич");
+
         Assertions.assertAll(
-                () -> Assertions.assertEquals(2L, createdReview.id()),
-                () -> Assertions.assertEquals(3L, createdReview1.id()),
-                () -> Assertions.assertEquals(4L, createdReview2.id()),
-                () -> Assertions.assertEquals(5L, createdReview3.id()),
-                () -> Assertions.assertTrue(reviewApiClient.getByReviewer("Арсений Евсеевич").contains(createdReview)),
-                () -> Assertions.assertTrue(reviewApiClient.getByReviewer("Арсений Евсеевич").contains(createdReview1)),
-                () -> Assertions.assertTrue(reviewApiClient.getByReviewer("Арсений Евсеевич").contains(createdReview2)),
-                () -> Assertions.assertTrue(reviewApiClient.getByReviewer("Арсений Евсеевич").contains(createdReview3)),
+                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview2.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertNotEquals(createdReview2.id(), createdReview3.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertNotEquals(createdReview3.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview3.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertNotEquals(createdReview2.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertNotEquals(createdReview3.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertTrue(reviewerReviews.contains(createdReview1)),
+                () -> Assertions.assertTrue(reviewerReviews.contains(createdReview2)),
+                () -> Assertions.assertTrue(reviewerReviews.contains(createdReview3)),
+                () -> Assertions.assertTrue(reviewerReviews.contains(createdReview4)),
                 () -> Assertions.assertEquals(initialSize + 4, resultSize));
     }
 
