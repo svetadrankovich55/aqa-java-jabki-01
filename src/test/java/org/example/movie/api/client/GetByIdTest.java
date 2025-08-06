@@ -65,13 +65,22 @@ public class GetByIdTest {
     @DisplayName("Проверка различия фильмов с разными ID")
     public void getByDifferentIdTest() {
         List<Movie> movies = new ArrayList<>(movieApiClient.getAllFilms());
-        Assertions.assertFalse(movies.isEmpty(), "Список не должен быть пустым");
+        Assertions.assertFalse(movies.isEmpty(), "Список фильмов не должен быть пустым");
         Collections.shuffle(movies);
 
-        Movie movie1 = movies.getFirst();
-        Movie movie2 = movies.get(1);
+        Movie movie1;
+        Movie movie2;
+        if (movies.size() >= 2) {
+            movie1 = movies.getFirst();
+            movie2 = movies.get(1);
+        } else {
+            throw new IllegalArgumentException("Список фильмов должен состоять минимум из 2 фильмов");
+        }
 
-        Assertions.assertNotEquals(movie1.title(), movie2.title());
+        Movie movieFirstId = movieApiClient.getById(movie1.id());
+        Movie movieSecondId = movieApiClient.getById(movie2.id());
+
+        Assertions.assertNotEquals(movieFirstId.title(), movieSecondId.title());
     }
 
     @Test
@@ -84,8 +93,11 @@ public class GetByIdTest {
         Movie firstCall = movies.getFirst();
         Movie secondCall = movies.getFirst();
 
+        Movie movieFirstCallId = movieApiClient.getById(firstCall.id());
+        Movie movieSecondCallId = movieApiClient.getById(secondCall.id());
+
         Assertions.assertAll(
-                () -> Assertions.assertEquals(firstCall, secondCall),
-                () -> Assertions.assertSame(firstCall, secondCall));
+                () -> Assertions.assertEquals(movieFirstCallId, movieSecondCallId),
+                () -> Assertions.assertSame(movieFirstCallId, movieSecondCallId));
     }
 }

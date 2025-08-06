@@ -42,74 +42,77 @@ public class GetByReviewerTest {
     @Test
     @DisplayName("Проверка получения отзыва после создания")
     public void getByReviewerMultipleReview() {
-        MovieRequest movierequest1 = new MovieRequest(
+        String reviewerName = "Арсений Евсеевич";
+        String message = "ID отзывов должны быть уникальны";
+
+        MovieRequest movieRequest1 = new MovieRequest(
                 "Inception",
                 148L,
                 LocalDate.of(2010, 7, 16),
                 Set.of(Genre.THRILLER)
         );
-        Movie testMovie1 = movieApiClient.createMovie(movierequest1);
+        Movie testMovie1 = movieApiClient.createMovie(movieRequest1);
         Long testMovie1Id = testMovie1.id();
 
-        MovieRequest movierequest2 = new MovieRequest(
+        MovieRequest movieRequest2 = new MovieRequest(
                 "Inception 2.0",
                 148L,
                 LocalDate.of(2010, 7, 16),
                 Set.of(Genre.THRILLER)
         );
-        Movie testMovie2= movieApiClient.createMovie(movierequest2);
+        Movie testMovie2= movieApiClient.createMovie(movieRequest2);
         Long testMovie2Id = testMovie2.id();
 
-        MovieRequest movierequest3 = new MovieRequest(
+        MovieRequest movieRequest3 = new MovieRequest(
                 "Inception 3.0",
                 148L,
                 LocalDate.of(2010, 7, 16),
                 Set.of(Genre.THRILLER)
         );
-        Movie testMovie3= movieApiClient.createMovie(movierequest3);
+        Movie testMovie3= movieApiClient.createMovie(movieRequest3);
         Long testMovie3Id = testMovie3.id();
 
         ReviewRequest reviewRequest1 = ReviewRequest.builder()
                 .filmId(testMovie1Id)
                 .text("Новый отзыв")
                 .like(false)
-                .reviewerName("Арсений Евсеевич")
+                .reviewerName(reviewerName)
                 .build();
         ReviewRequest reviewRequest2 = ReviewRequest.builder()
                 .filmId(testMovie2Id)
                 .text("Первый отзыв")
                 .like(true)
-                .reviewerName("Арсений Евсеевич")
+                .reviewerName(reviewerName)
                 .build();
         ReviewRequest reviewRequest3 = ReviewRequest.builder()
                 .filmId(testMovie2Id)
                 .text("Второй отзыв")
                 .like(false)
-                .reviewerName("Арсений Евсеевич").build();
+                .reviewerName(reviewerName).build();
         ReviewRequest reviewRequest4 = ReviewRequest.builder()
                 .filmId(testMovie3Id)
                 .text("Третий отзыв")
                 .like(false)
-                .reviewerName("Арсений Евсеевич")
+                .reviewerName(reviewerName)
                 .build();
 
-        int initialSize = reviewApiClient.getByReviewer("Арсений Евсеевич").size();
+        int initialSize = reviewApiClient.getByReviewer(reviewerName).size();
         Review createdReview1 = reviewApiClient.createReview(reviewRequest1);
         Review createdReview2 = reviewApiClient.createReview(reviewRequest2);
         Review createdReview3 = reviewApiClient.createReview(reviewRequest3);
         Review createdReview4 = reviewApiClient.createReview(reviewRequest4);
-        int resultSize = reviewApiClient.getByReviewer("Арсений Евсеевич").size();
+        int resultSize = reviewApiClient.getByReviewer(reviewerName).size();
 
-        Set<Review> reviewerReviews = reviewApiClient.getByReviewer("Арсений Евсеевич");
+        Set<Review> reviewerReviews = reviewApiClient.getByReviewer(reviewerName);
 
         Assertions.assertAll(
-                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview2.id(), "ID отзывов должны быть уникальны"),
-                () -> Assertions.assertNotEquals(createdReview2.id(), createdReview3.id(), "ID отзывов должны быть уникальны"),
-                () -> Assertions.assertNotEquals(createdReview3.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
-                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview3.id(), "ID отзывов должны быть уникальны"),
-                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
-                () -> Assertions.assertNotEquals(createdReview2.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
-                () -> Assertions.assertNotEquals(createdReview3.id(), createdReview4.id(), "ID отзывов должны быть уникальны"),
+                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview2.id(), message),
+                () -> Assertions.assertNotEquals(createdReview2.id(), createdReview3.id(), message),
+                () -> Assertions.assertNotEquals(createdReview3.id(), createdReview4.id(), message),
+                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview3.id(), message),
+                () -> Assertions.assertNotEquals(createdReview1.id(), createdReview4.id(), message),
+                () -> Assertions.assertNotEquals(createdReview2.id(), createdReview4.id(), message),
+                () -> Assertions.assertNotEquals(createdReview3.id(), createdReview4.id(), message),
                 () -> Assertions.assertTrue(reviewerReviews.contains(createdReview1)),
                 () -> Assertions.assertTrue(reviewerReviews.contains(createdReview2)),
                 () -> Assertions.assertTrue(reviewerReviews.contains(createdReview3)),

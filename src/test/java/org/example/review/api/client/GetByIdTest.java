@@ -13,6 +13,8 @@ import ru.dpd.edu.model.ReviewRequest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class GetByIdTest {
@@ -69,10 +71,19 @@ public class GetByIdTest {
     @Test
     @DisplayName("Получение отзывов по несуществующему Id")
     public void getByFilmIdNonExistingFilmId() {
-        Long nonExistingId = 777L;
+        Set<Long> existingIds = reviewApiClient.getAll().stream()
+                .map(Review::id)
+                .collect(Collectors.toSet());
+
+        long nonExistingId;
+        if (existingIds.isEmpty()) {
+            nonExistingId = 1L;
+        } else {
+            nonExistingId = Collections.max(existingIds) + 1;
+        }
 
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.getById(nonExistingId));
 
-        Assertions.assertEquals("Ревью по ID = 777 не найден", exception.getMessage());
+        Assertions.assertEquals(String.format("Ревью по ID = %d не найден", nonExistingId), exception.getMessage());
     }
 }

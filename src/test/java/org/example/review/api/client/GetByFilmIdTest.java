@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GetByFilmIdTest {
     private MovieApiClient movieApiClient;
@@ -95,11 +96,20 @@ public class GetByFilmIdTest {
     @Test
     @DisplayName("Получение отзывов по несуществующему filmId")
     public void getByFilmIdNonExistingFilmId() {
-        Long nonExistingFilmId = 999L;
+        Set<Long> existingIds = movieApiClient.getAllFilms().stream()
+                .map(Movie::id)
+                .collect(Collectors.toSet());
+
+        long nonExistingFilmId;
+        if (existingIds.isEmpty()) {
+            nonExistingFilmId = 1L;
+        } else {
+            nonExistingFilmId = Collections.max(existingIds) + 1;
+        }
 
         RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> reviewApiClient.getByFilmId(nonExistingFilmId));
 
-        Assertions.assertEquals("Отзывы по фильму ID = 999 не найдены", exception.getMessage());
+        Assertions.assertEquals(String.format("Отзывы по фильму ID = %d не найдены", nonExistingFilmId), exception.getMessage());
     }
 
     @Test
